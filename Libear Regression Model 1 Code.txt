@@ -1,0 +1,73 @@
+import numpy as np
+import pandas as pd 
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn import metrics
+
+car_dataset = pd.read_csv("Car_Price.csv")
+car_dataset.head()
+car_dataset.shape
+car_dataset.info()	
+car_dataset.describe()
+
+car_dataset.CarName.unique()
+car_dataset.price.sum()
+car_dataset.carbody.unique()
+car_dataset.isnull().sum()
+print(car_dataset.fueltype.value_counts())
+print(car_dataset.carbody.value_counts())
+
+y=car_dataset[["price"]]
+x=car_dataset[["enginesize"]]
+lm = LinearRegression()
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=101)
+lm.fit(x_train,y_train)
+
+print(lm.intercept_,lm.coef_)
+pred=lm.predict(x_test)
+print(pred[0:10])
+training_pred=lm.predict(x_test)
+error_score=metrics.r2_score(y_test,training_pred)
+print(error_score)
+
+plt.scatter(y_test,training_pred,color="red")
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.show()
+
+sns.jointplot(y=car_dataset[["price"]],x=car_dataset[["enginesize",]],data=car_dataset,kind="reg",color="blue")
+
+sns.distplot(y_test-pred,bins=50,color="red",kde=False)
+
+plt.figure(figsize = (10, 5))
+sns.heatmap(car_dataset.corr(), annot = True, cmap="YlGnBu")
+plt.show()
+
+plt.figure(figsize = (10,5))
+sns.countplot(x="enginesize",data=car_dataset)
+plt.show()
+
+plt.figure(figsize = (10,5))
+sns.violinplot(x="drivewheel",y="price",data=car_dataset)
+plt.show()
+
+plt.figure(figsize = (10,5))
+sns.countplot(x="fuelsystem",data=car_dataset)
+plt.show()
+
+sns.boxplot(x="enginesize",data=car_dataset,color="green")
+
+plt.figure(figsize = (5,5))
+sns.stripplot(x="enginesize",y="price",data=car_dataset)
+plt.show()
+
+plt.figure(figsize = (5,5))
+sns.kdeplot(car_dataset.price,car_dataset.enginesize)
+plt.show()
+
+df= pd.DataFrame(car_dataset.groupby(['fueltype'])['price'].mean().sort_values(ascending = False))
+df.plot.bar()
+plt.title('Fuel Type vs Average Price')
+plt.show()
